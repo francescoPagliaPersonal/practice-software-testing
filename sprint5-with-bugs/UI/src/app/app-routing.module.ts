@@ -7,6 +7,9 @@ import {OverviewComponent as ProductRentalsOverviewComponent} from './products/r
 import {CategoryComponent as ProductCategoryComponent} from './products/category/category.component';
 import {DetailComponent as ProductDetailComponent} from './products/detail/detail.component';
 import {PagenotfoundComponent} from "./shared/pagenotfound/pagenotfound.component";
+import {SustainabilityComponent} from "./sustainability/sustainability.component";
+import {AboutComponent} from "./about/about.component";
+import {LegalComponent} from "./legal/legal.component";
 
 const routes: Routes = [
   {path: "", component: ProductOverviewComponent},
@@ -15,6 +18,9 @@ const routes: Routes = [
   {path: 'rentals', component: ProductRentalsOverviewComponent},
   {path: 'checkout', component: CheckoutComponent},
   {path: 'contact', component: ContactComponent},
+  {path: 'sustainability', component: SustainabilityComponent},
+  {path: 'about', component: AboutComponent},
+  {path: 'legal', component: LegalComponent},
   {path: 'auth', loadChildren: () => import(`./auth/auth.module`).then(m => m.AuthModule)},
   {path: 'account', loadChildren: () => import(`./account/account.module`).then(m => m.AccountModule)},
   {path: 'admin', loadChildren: () => import(`./admin/admin.module`).then(m => m.AdminModule)},
