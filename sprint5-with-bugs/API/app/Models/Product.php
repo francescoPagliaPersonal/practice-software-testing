@@ -86,12 +86,12 @@ class Product extends BaseModel
 
     public function getIsEcoFriendlyAttribute()
     {
-        return in_array(strtoupper($this->co2_rating ?? ''), ['D', 'E']);
+        return in_array(strtoupper($this->co2_rating ?? ''), ['A', 'B']);
     }
 
     public function scopeEcoFriendly($query)
     {
-        return $query->whereIn('co2_rating', ['D', 'E', 'd', 'e']);
+        return $query->whereIn('co2_rating', ['A', 'B', 'a', 'b']);
     }
 
     public function scopeWithFilters($query, array $filters)
