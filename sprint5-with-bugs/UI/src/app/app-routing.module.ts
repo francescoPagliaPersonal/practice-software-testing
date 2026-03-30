@@ -10,6 +10,7 @@ import {PagenotfoundComponent} from "./shared/pagenotfound/pagenotfound.componen
 import {SustainabilityComponent} from "./sustainability/sustainability.component";
 import {AboutComponent} from "./about/about.component";
 import {LegalComponent} from "./legal/legal.component";
+import {PrivacyComponent} from "./privacy/privacy.component";
 
 const routes: Routes = [
   {path: "", component: ProductOverviewComponent},
@@ -21,6 +22,7 @@ const routes: Routes = [
   {path: 'sustainability', component: SustainabilityComponent},
   {path: 'about', component: AboutComponent},
   {path: 'legal', component: LegalComponent},
+  {path: 'privacy', component: PrivacyComponent},
   {path: 'auth', loadChildren: () => import(`./auth/auth.module`).then(m => m.AuthModule)},
   {path: 'account', loadChildren: () => import(`./account/account.module`).then(m => m.AccountModule)},
   {path: 'admin', loadChildren: () => import(`./admin/admin.module`).then(m => m.AdminModule)},
