@@ -1,17 +1,20 @@
-import {test, expect} from '@playwright/test';
+import { test, expect } from '@playwright/test'
+import { LoginPage } from './pages/LoginPage'
 
-test.describe('Login Feature', () => {
+test.describe('Login Page - based on LoginTestCases.md', () => {
+	let loginPage: LoginPage
+	const validEmail = 'jdoe@gmail.com'
+	const validPassword = 'AAAAbb1!v!'
 
-    test('Login_withValidUserCredentials_dasboardIsDisplayed', async ({page}) => {
-        await page.goto('');
+	test.beforeEach(async ({ page }) => {
+		loginPage = new LoginPage(page)
+		await loginPage.open()
+	})
 
-        await page.locator('[data-test="nav-sign-in"]').click();
+	test('REG-TC-002 - successful login with valid credentials @smoke', async ({ page }) => {
+		await loginPage.login(validEmail, validPassword)
 
-        await page.locator('[data-test="email"]').fill('customer@practicesoftwaretesting.com');
-        await page.locator('[data-test="password"]').fill('welcome01');
-        await page.locator('[data-test="login-submit"]').click();
-
-        await expect(page.locator('[data-test="page-title"]')).toContainText('My account');
-    });
-
-});
+		await expect(page).toHaveURL(/account/)
+		await expect(page.locator('h1')).toContainText('My account')
+	})
+})
