@@ -1,0 +1,17 @@
+# US-1012 T1T5 Regression Test Set
+
+As a product owner
+I want that for the 10 most important use cases T1T5 Test Cases are defined
+in order to have a set on regression tests.
+
+# ACC
+
+ - A list of the 10 most important use cases is defined and agreed upon by the Product Owner and development team.
+ - For each of the 10 use cases, T1–T5 test cases are created.
+ - Each test case includes:
+	- preconditions
+	- test steps
+	- expected results
+ - The resulting test set can be used for regression testing of critical functionality.
+ - All test cases are documented in the agreed test management tool (e.g. Testiny).
+ - The test cases are reviewed and approved by the team.
