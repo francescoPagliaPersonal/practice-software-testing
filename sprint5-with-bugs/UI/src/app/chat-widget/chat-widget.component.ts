@@ -89,16 +89,45 @@ export class ChatWidgetComponent implements OnInit {
     {value: 'Bank Transfer', label: 'Bank Transfer'},
     {value: 'Cash on Delivery', label: 'Cash on Delivery'},
     {value: 'Credit Card', label: 'Credit Card'},
+    {value: 'Afterpay', label: 'Afterpay (Survey)'},
     {value: 'Buy Now Pay Later', label: 'Buy Now Pay Later'},
     {value: 'Gift Card', label: 'Gift Card'}
   ];
+
+  // Tracks survey interest for an unimplemented Afterpay option.
+  afterpayInterestCount = 0;
 
   // Cart total for display
   cartTotal = 0;
 
   ngOnInit(): void {
+    this.loadAfterpayInterestCount();
     this.initializeChat();
     this.checkUserSignedIn();
+  }
+
+  private loadAfterpayInterestCount(): void {
+    this.paymentService.getAfterpayInterestCount().subscribe({
+      next: (res) => {
+        this.afterpayInterestCount = Number(res?.count) || 0;
+      },
+      error: () => {
+        this.afterpayInterestCount = 0;
+      }
+    });
+  }
+
+  private incrementAfterpayInterestCount(): void {
+    this.paymentService.voteAfterpayInterest().subscribe({
+      next: (res) => {
+        this.afterpayInterestCount = Number(res?.count) || (this.afterpayInterestCount + 1);
+        this.addBotMessage('Thanks! Your vote has been recorded.');
+        this.addBotMessage(`Afterpay interest count: ${this.afterpayInterestCount}`);
+      },
+      error: () => {
+        this.addBotMessage('Could not record your vote right now. Please try again later.');
+      }
+    });
   }
 
   private checkUserSignedIn(): void {
@@ -367,6 +396,20 @@ export class ChatWidgetComponent implements OnInit {
 
       case 'select-payment-method':
         if (action.data) {
+          if (action.data === 'Afterpay') {
+            const wantsAfterpay = window.confirm(
+              'Afterpay is not available yet. Would you like to vote for adding it as a payment method?'
+            );
+
+            if (wantsAfterpay) {
+              this.incrementAfterpayInterestCount();
+            }
+
+            this.currentStep = 'checkout-payment-method';
+            this.addBotMessage('Please select another payment method to complete checkout:', this.getPaymentMethodActions());
+            break;
+          }
+
           this.checkoutData.paymentMethod = action.data;
           this.currentStep = 'checkout-payment-account-name';
           this.addBotMessage('Please enter the account name:', [{label: 'Back to menu', action: 'back-to-menu'}]);

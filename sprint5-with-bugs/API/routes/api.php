@@ -103,6 +103,8 @@ Route::controller(InvoiceController::class)->prefix('invoices')->group(function 
 
 Route::controller(PaymentController::class)->prefix('payment')->group(function () {
     Route::post('/check', 'check');
+    Route::get('/afterpay-interest', 'afterpayInterest');
+    Route::post('/afterpay-interest', 'voteAfterpayInterest');
 });
 
 Route::controller(ProductController::class)->prefix('products')->group(function () {
