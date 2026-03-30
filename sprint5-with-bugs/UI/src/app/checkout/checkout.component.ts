@@ -31,7 +31,7 @@ export class CheckoutComponent implements OnInit {
   private readonly customerAccountService = inject(CustomerAccountService);
   private readonly tokenStorage = inject(TokenStorageService);
 
-  PaymentMethods: any = ['Bank Transfer', 'Cash on Delivery', 'Credit Card', 'Buy Now Pay Later', 'Gift Card'];
+  PaymentMethods: any = ['Bank Transfer', 'Cash on Delivery', 'Credit Card', 'Buy Now Pay Later', 'Gift Card', 'Afterpay'];
   cusAddress: FormGroup | any;
   cusPayment: FormGroup | any;
   cusForm: FormGroup | any;
@@ -172,6 +172,18 @@ export class CheckoutComponent implements OnInit {
   finishFunction() {
     const invoiceItems: any = [];
 
+	if (this.cusPayment.value.payment_method == 'Afterpay') {
+    const confirmed = window.confirm('Would you like to use Afterpay for this payment?\nSelect OK if yes, cancel if no');
+
+    if (!confirmed) {
+      return;
+    }
+	let count = Number(localStorage.getItem('afterpay_counter')) || 0;
+  	count++;
+  	localStorage.setItem('afterpay_counter', count.toString());
+
+  	console.log('Afterpay selected count:', count);
+  }
     this.cartService.getItems().forEach((item: { id: number; price: number; quantity: number }) => {
       const invoiceItem = {'product_id': item.id, 'unit_price': item.price, 'quantity': item.quantity};
       invoiceItems.push(invoiceItem);
