@@ -3,14 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class PaymentController extends Controller
 {
-    private const AFTERPAY_INTEREST_CACHE_KEY = 'afterpay_interest_count';
-
     /**
      * @OA\Post(
      *      path="/payment/check",
@@ -64,25 +61,5 @@ class PaymentController extends Controller
         ]);
 
         return $this->preferredFormat($response, ResponseAlias::HTTP_OK);
-    }
-
-    public function afterpayInterest()
-    {
-        $count = (int) Cache::get(self::AFTERPAY_INTEREST_CACHE_KEY, 0);
-
-        return $this->preferredFormat([
-            'count' => $count,
-        ], ResponseAlias::HTTP_OK);
-    }
-
-    public function voteAfterpayInterest()
-    {
-        Cache::add(self::AFTERPAY_INTEREST_CACHE_KEY, 0);
-        $count = Cache::increment(self::AFTERPAY_INTEREST_CACHE_KEY);
-
-        return $this->preferredFormat([
-            'count' => (int) $count,
-            'message' => 'Afterpay interest recorded',
-        ], ResponseAlias::HTTP_OK);
     }
 }

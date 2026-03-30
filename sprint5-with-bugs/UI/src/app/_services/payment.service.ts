@@ -1,7 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
-import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,13 +10,5 @@ export class PaymentService {
 
   validate(api_url: any, payload: any): Observable<any> {
     return this.httpClient.post(api_url, payload, {responseType: 'json'});
-  }
-
-  getAfterpayInterestCount(): Observable<any> {
-    return this.httpClient.get(`${environment.apiUrl}/payment/afterpay-interest`, {responseType: 'json'});
-  }
-
-  voteAfterpayInterest(): Observable<any> {
-    return this.httpClient.post(`${environment.apiUrl}/payment/afterpay-interest`, {}, {responseType: 'json'});
   }
 }
