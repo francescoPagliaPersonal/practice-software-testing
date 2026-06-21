@@ -2,6 +2,7 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {CheckoutComponent} from "./checkout/checkout.component";
 import {ContactComponent} from "./contact/contact.component";
+import {InfoComponent} from "./info/info.component";
 import {OverviewComponent as ProductOverviewComponent} from './products/overview/overview.component';
 import {OverviewComponent as ProductRentalsOverviewComponent} from './products/rentals/overview/overview.component';
 import {CategoryComponent as ProductCategoryComponent} from './products/category/category.component';
@@ -15,6 +16,7 @@ const routes: Routes = [
   {path: 'rentals', component: ProductRentalsOverviewComponent},
   {path: 'checkout', component: CheckoutComponent},
   {path: 'contact', component: ContactComponent},
+  {path: 'info', component: InfoComponent},
   {path: 'auth', loadChildren: () => import(`./auth/auth.module`).then(m => m.AuthModule)},
   {path: 'account', loadChildren: () => import(`./account/account.module`).then(m => m.AccountModule)},
   {path: 'admin', loadChildren: () => import(`./admin/admin.module`).then(m => m.AdminModule)},

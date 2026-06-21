@@ -1,0 +1,25 @@
+diff --git a/init-data.sh b/init-data.sh
+index 192c3fb..8d51b7d 100755
+--- a/init-data.sh
++++ b/init-data.sh
+@@ -1 +1 @@
+-docker-compose exec laravel-api php artisan migrate:fresh --seed --force
+\ No newline at end of file
++docker compose exec laravel-api php artisan migrate:fresh --seed --force
+diff --git a/sprint5/API/.env b/sprint5/API/.env
+index 74067a5..0d1fd1c 100644
+--- a/sprint5/API/.env
++++ b/sprint5/API/.env
+@@ -16,10 +16,10 @@ LOG_DEPRECATIONS_CHANNEL=null
+ LOG_LEVEL=debug
+ 
+ DB_CONNECTION=mysql
+-DB_HOST=127.0.0.1
++DB_HOST=practice-software-testing-mariadb-1
+ DB_PORT=3306
+ DB_DATABASE=toolshop
+-DB_USERNAME=user
++DB_USERNAME=root
+ DB_PASSWORD=root
+ 
+ BROADCAST_DRIVER=log
