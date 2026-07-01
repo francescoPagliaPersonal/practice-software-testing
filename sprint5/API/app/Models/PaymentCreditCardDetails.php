@@ -13,12 +13,12 @@ class PaymentCreditCardDetails extends BaseModel
 
     protected $guarded = [];
 
-    protected $hidden = ['id', 'created_at', 'updated_at'];
-
+    // pan_ciphertext is excluded from all API responses — it is only
+    // accessible via CreditCardVaultService::detokenize() in admin endpoints.
+    protected $hidden = ['id', 'created_at', 'updated_at', 'pan_ciphertext'];
 
     public function payment()
     {
         return $this->morphOne(Payment::class, 'payment_details');
     }
-
 }

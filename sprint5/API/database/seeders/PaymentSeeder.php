@@ -4,6 +4,7 @@
 
 namespace database\seeders;
 
+use App\Services\Vault\CreditCardVaultService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -12,10 +13,33 @@ class PaymentSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     *
+     * Credit card seed data is tokenized via CreditCardVaultService so the
+     * seeded database matches exactly what a real checkout would produce:
+     * masked token in credit_card_number, encrypted blob in pan_ciphertext,
+     * and NULL in cvv.
      */
     public function run(): void
     {
         mt_srand(12345); // Fixed seed for reproducibility
+
+        /** @var CreditCardVaultService $vault */
+        $vault = app(CreditCardVaultService::class);
+
+        // Tokenize the two seed PANs once so we can reference them below.
+        $card1 = $vault->tokenize([
+            'credit_card_number' => '0001-0002-0003-0004',
+            'expiration_date'    => '02/' . rand(2025, 2028),
+            'cvv'                => '000',
+            'card_holder_name'   => 'John Doe',
+        ]);
+
+        $card2 = $vault->tokenize([
+            'credit_card_number' => '1000-2000-3000-4000',
+            'expiration_date'    => rand(5, 12) . '/' . rand(2025, 2028),
+            'cvv'                => '000',
+            'card_holder_name'   => 'Jane Doe',
+        ]);
 
         $paymentMethods = [
             'bank-transfer' => [
@@ -35,22 +59,14 @@ class PaymentSeeder extends Seeder
                 ]
             ],
             'credit-card' => [
-                [
-                    'credit_card_number' => '0001-0002-0003-0004',
-                    'expiration_date' => '02/' . rand(2025, 2028),
-                    'cvv' => rand(100, 999),
-                    'card_holder_name' => 'John Doe',
+                array_merge($card1, [
                     'table' => 'payment_credit_card_details',
                     'model' => 'App\\Models\\PaymentCreditCardDetails'
-                ],
-                [
-                    'credit_card_number' => '1000-2000-3000-4000',
-                    'expiration_date' => rand(05, 12) . '/' . rand(2025, 2028),
-                    'cvv' => rand(100, 999),
-                    'card_holder_name' => 'Jane Doe',
+                ]),
+                array_merge($card2, [
                     'table' => 'payment_credit_card_details',
                     'model' => 'App\\Models\\PaymentCreditCardDetails'
-                ]
+                ]),
             ],
             'gift-card' => [
                 [

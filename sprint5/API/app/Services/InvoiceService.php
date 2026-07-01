@@ -14,6 +14,7 @@ use App\Models\PaymentBnplDetails;
 use App\Models\PaymentCashOnDeliveryDetails;
 use App\Models\PaymentCreditCardDetails;
 use App\Models\PaymentGiftCardDetails;
+use App\Services\Vault\CreditCardVaultService;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -23,10 +24,14 @@ use InvalidArgumentException;
 class InvoiceService
 {
     protected $invoiceNumberGenerator;
+    private CreditCardVaultService $vault;
 
-    public function __construct(InvoiceNumberGenerator $invoiceNumberGenerator)
-    {
+    public function __construct(
+        InvoiceNumberGenerator $invoiceNumberGenerator,
+        CreditCardVaultService $vault
+    ) {
         $this->invoiceNumberGenerator = $invoiceNumberGenerator;
+        $this->vault = $vault;
     }
 
     public function getInvoices($isAdmin)
@@ -197,6 +202,19 @@ class InvoiceService
         return $invoice;
     }
 
+    // -------------------------------------------------------------------------
+    // WHERE IT HAPPENS — PCI-DSS pseudonymization boundary
+    //
+    // handlePayment() is the only place that receives raw card details.
+    // When the payment method is 'credit-card', the raw details pass through
+    // CreditCardVaultService::tokenize() BEFORE touching any Eloquent model.
+    // After tokenize():
+    //   - credit_card_number  = "****-****-****-XXXX"  (safe for DB + API)
+    //   - pan_ciphertext       = AES-256-GCM / KMS blob  (reversible, admin-only)
+    //   - cvv                  = null                     (never persisted)
+    //
+    // Raw PAN and CVV are never written to the database, logs, or any model.
+    // -------------------------------------------------------------------------
     public function handlePayment($invoiceId, $paymentMethod, array $details)
     {
         Log::info('Handling payment', ['invoice_id' => $invoiceId, 'method' => $paymentMethod]);
@@ -216,9 +234,15 @@ class InvoiceService
                 case 'cash-on-delivery':
                     $paymentDetails = new PaymentCashOnDeliveryDetails();
                     break;
+
                 case 'credit-card':
-                    $paymentDetails = new PaymentCreditCardDetails($details);
+                    // Tokenize BEFORE constructing the Eloquent model.
+                    // $details still contains the raw PAN and CVV at this point.
+                    $safeDetails = $this->vault->tokenize($details);
+                    // $safeDetails now: masked token + pan_ciphertext + cvv=null
+                    $paymentDetails = new PaymentCreditCardDetails($safeDetails);
                     break;
+
                 case 'buy-now-pay-later':
                     $paymentDetails = new PaymentBnplDetails($details);
                     break;
