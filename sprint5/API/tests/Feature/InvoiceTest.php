@@ -120,6 +120,42 @@ test('it creates new invoice successfully credit card', function () {
         'card_holder_name' => 'John Doe'
     ];
     createsNewInvoiceSuccessfully($this, 'credit-card', $paymentDetails);
+
+    // PCI-DSS: only the masked token is stored — raw PAN must not appear.
+    $this->assertDatabaseHas('payment_credit_card_details', [
+        'credit_card_number' => '****-****-****-1121',
+    ]);
+    $this->assertDatabaseMissing('payment_credit_card_details', [
+        'credit_card_number' => '1234-5678-9101-1121',
+    ]);
+
+    // PCI-DSS req 3.2: CVV must never be stored.
+    $this->assertDatabaseHas('payment_credit_card_details', [
+        'cvv' => null,
+    ]);
+
+    // Encrypted blob must be present and must not contain readable card digits.
+    $row = \Illuminate\Support\Facades\DB::table('payment_credit_card_details')->first();
+    expect($row->pan_ciphertext)->not->toBeNull();
+    expect($row->pan_ciphertext)->not->toContain('1234');
+    expect($row->pan_ciphertext)->not->toContain('5678');
+});
+
+test('vault detokenize recovers original PAN', function () {
+    $paymentDetails = [
+        'credit_card_number' => '1234-5678-9101-1121',
+        'expiration_date' => '12/2030',
+        'cvv' => '123',
+        'card_holder_name' => 'John Doe'
+    ];
+    createsNewInvoiceSuccessfully($this, 'credit-card', $paymentDetails);
+
+    $row = \Illuminate\Support\Facades\DB::table('payment_credit_card_details')->first();
+
+    /** @var \App\Services\Vault\CreditCardVaultService $vault */
+    $vault = app(\App\Services\Vault\CreditCardVaultService::class);
+
+    expect($vault->detokenize($row->pan_ciphertext))->toBe('1234-5678-9101-1121');
 });
 
 test('it creates new invoice successfully cash', function () {
