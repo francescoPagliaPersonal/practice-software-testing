@@ -1,0 +1,24 @@
+name: Require Tag on Merge to Main
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  check-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check commit has a tag
+        run: |
+          git fetch --tags
+          if git describe --exact-match --tags HEAD 2>/dev/null; then
+            echo "Tag found: $(git describe --exact-match --tags HEAD)"
+          else
+            echo "ERROR: The tip commit of this branch has no git tag."
+            echo "Create a tag before merging: git tag -a 6.1.0 -m 'Release 6.1.0'"
+            exit 1
+          fi
