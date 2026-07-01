@@ -34,6 +34,7 @@ export class HeaderComponent implements OnDestroy, OnInit {
   isLoggedIn: boolean;
   subscription: Subscription;
   showBugHuntingButton: boolean = false;
+  logoPath = 'assets/logo.png';
 
   constructor() {
     this.cartService.storageSub.subscribe(() => {
@@ -57,7 +58,7 @@ export class HeaderComponent implements OnDestroy, OnInit {
     this.activeLanguage = this.translocoService.getActiveLang();
     document.documentElement.setAttribute('lang', this.activeLanguage);
     this.getSignedInUser();
-
+    this.loadLogoByGeolocation();
     // Check if Bug Hunting button should be shown (only on deployed version)
     this.showBugHuntingButton = this.isDeployedVersion();
 
@@ -146,6 +147,58 @@ export class HeaderComponent implements OnDestroy, OnInit {
     window.open(bugHuntingUrl, '_blank');
   }
 
+  private loadLogoByGeolocation(): void {
+  if (!navigator.geolocation) {
+    console.log('Geolocation is not supported');
+    this.logoPath = 'assets/logo.png';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      console.log('Latitude:', latitude);
+      console.log('Longitude:', longitude);
+
+      this.setLogoByCoordinates(latitude, longitude);
+    },
+    (error) => {
+      console.error('Geolocation error:', error);
+      this.logoPath = 'assets/logo.png';
+    }
+  );
+}
+
+private setLogoByCoordinates(latitude: number, longitude: number): void {
+  // Rough Czech Republic area
+  if (
+    latitude >= 48.5 &&
+    latitude <= 51.1 &&
+    longitude >= 12.0 &&
+    longitude <= 19.0
+  ) {
+    this.logoPath = 'assets/logo-cz.png';
+  }
+
+  // Rough USA area
+  else if (
+    latitude >= 24.0 &&
+    latitude <= 49.5 &&
+    longitude >= -125.0 &&
+    longitude <= -66.0
+  ) {
+    this.logoPath = 'assets/logo-us.png';
+  }
+
+  // Other countries
+  else {
+    this.logoPath = 'assets/logo.png';
+  }
+
+  console.log('Selected logo:', this.logoPath);
+}
   private isDeployedVersion(): boolean {
     // Check if running on deployed version vs Docker/localhost
     const hostname = window.location.hostname;
