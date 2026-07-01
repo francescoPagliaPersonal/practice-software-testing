@@ -15,7 +15,10 @@ class PaymentCreditCardDetails extends BaseModel
 
     // pan_ciphertext is excluded from all API responses — it is only
     // accessible via CreditCardVaultService::detokenize() in admin endpoints.
-    protected $hidden = ['id', 'created_at', 'updated_at', 'pan_ciphertext'];
+    // cvv and pan_ciphertext must never appear in API responses.
+    // cvv: PCI-DSS req 3.2 — must not be stored or returned.
+    // pan_ciphertext: raw ciphertext is admin-only via detokenize().
+    protected $hidden = ['id', 'created_at', 'updated_at', 'cvv', 'pan_ciphertext'];
 
     public function payment()
     {

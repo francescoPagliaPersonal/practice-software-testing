@@ -38,6 +38,20 @@ class Handler extends ExceptionHandler
     ];
 
     /**
+     * Input keys that must never appear in exception reports, Ignition,
+     * or any external error tracker. CVV is included per PCI-DSS req 3.2.
+     *
+     * @var array<int, string>
+     */
+    protected $dontFlash = [
+        'payment_details.cvv',
+        'payment_details.credit_card_number',
+        'current_password',
+        'password',
+        'password_confirmation',
+    ];
+
+    /**
      * Report or log an exception.
      *
      * @param Throwable $e

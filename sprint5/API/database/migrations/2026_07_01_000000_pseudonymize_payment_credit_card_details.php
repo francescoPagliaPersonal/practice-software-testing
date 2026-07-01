@@ -22,10 +22,8 @@ return new class extends Migration {
         Schema::table('payment_credit_card_details', function (Blueprint $table) {
             // Encrypted PAN blob. TEXT because KMS ciphertexts are base64
             // strings of variable length (~380 chars for a 16-digit PAN).
+            // cvv nullable is already set in the original create migration.
             $table->text('pan_ciphertext')->nullable()->after('credit_card_number');
-
-            // CVV must never be stored after authorization (PCI-DSS req 3.2).
-            $table->string('cvv', 10)->nullable()->change();
         });
     }
 
@@ -33,7 +31,6 @@ return new class extends Migration {
     {
         Schema::table('payment_credit_card_details', function (Blueprint $table) {
             $table->dropColumn('pan_ciphertext');
-            $table->string('cvv', 10)->nullable(false)->change();
         });
     }
 };

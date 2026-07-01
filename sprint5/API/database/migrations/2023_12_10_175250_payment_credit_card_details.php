@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->ulid('id')->primary();
             $table->string('credit_card_number', 40);
             $table->string('expiration_date', 10);
-            $table->string('cvv', 10);
+            $table->string('cvv', 10)->nullable(); // PCI-DSS: always stored NULL post-auth
             $table->string('card_holder_name', 70);
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent();

@@ -239,6 +239,9 @@ class InvoiceService
                     // Tokenize BEFORE constructing the Eloquent model.
                     // $details still contains the raw PAN and CVV at this point.
                     $safeDetails = $this->vault->tokenize($details);
+                    // Explicitly destroy the raw-details reference so the PAN
+                    // and CVV leave the stack frame immediately, not at GC time.
+                    unset($details);
                     // $safeDetails now: masked token + pan_ciphertext + cvv=null
                     $paymentDetails = new PaymentCreditCardDetails($safeDetails);
                     break;

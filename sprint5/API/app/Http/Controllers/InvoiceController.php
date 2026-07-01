@@ -98,7 +98,13 @@ class InvoiceController extends Controller
     public function store(StoreInvoice $request)
     {
         $invoice = $this->invoiceService->createInvoice($request->except(['cart_id']), $request->input('cart_id'));
-        $this->invoiceService->handlePayment($invoice->id, $request->input('payment_method'), Arr::except($request->input('payment_details'), ['@type']) ?? []);
+
+        // Strip CVV at the controller boundary — it must not travel further
+        // than the payment-check step. The vault handles removal inside
+        // handlePayment(), but defence-in-depth requires stripping it here too.
+        $paymentDetails = Arr::except($request->input('payment_details') ?? [], ['@type', 'cvv']);
+
+        $this->invoiceService->handlePayment($invoice->id, $request->input('payment_method'), $paymentDetails);
 
         // Queue the checkout email so the user gets a fast response.
         SendCheckoutEmail::dispatch($invoice->id, Auth::user());
@@ -153,7 +159,11 @@ class InvoiceController extends Controller
         ]);
 
         $invoice = $this->invoiceService->createGuestInvoice($request->except(['cart_id']), $request->input('cart_id'));
-        $this->invoiceService->handlePayment($invoice->id, $request->input('payment_method'), Arr::except($request->input('payment_details'), ['@type']) ?? []);
+
+        // CVV stripped at boundary — same policy as store().
+        $paymentDetails = Arr::except($request->input('payment_details') ?? [], ['@type', 'cvv']);
+
+        $this->invoiceService->handlePayment($invoice->id, $request->input('payment_method'), $paymentDetails);
 
         // Queue the checkout email for the guest so the response stays fast.
         $guestUser = (object) [
