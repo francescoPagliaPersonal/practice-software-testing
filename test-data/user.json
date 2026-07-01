@@ -1,0 +1,15 @@
+{
+  "first_name": "Mary",
+  "last_name": "Jane",
+  "password": "ToolshopTest_2026!Mary",
+  "phone": "123456789",
+  "dob": "1990-01-01",
+  "address": {
+    "street": "Test Street",
+    "house_number": "1",
+    "city": "Vienna",
+    "state": "Vienna",
+    "country": "Austria",
+    "postal_code": "1010"
+  }
+}
