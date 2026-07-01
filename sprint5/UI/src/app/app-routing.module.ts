@@ -12,6 +12,7 @@ const routes: Routes = [
   { path: 'auth', loadChildren: () => import(`./auth/auth.module`).then(m => m.AuthModule), data: { title: 'Authentication' } },
   { path: 'account', loadChildren: () => import(`./account/account.module`).then(m => m.AccountModule), data: { title: 'Account' } },
   { path: 'admin', loadChildren: () => import(`./admin/admin.module`).then(m => m.AdminModule), data: { title: 'Admin' } },
+  { path: 'imprint', loadComponent: () => import('./imprint/imprint.component').then(m => m.ImprintComponent), data: { title: 'Imprint' } },
 ];
 
 @NgModule({
