@@ -1,6 +1,7 @@
 // Copyright (c) 2024-2026 Testsmith. All rights reserved.
 // See LICENSE for details.
 
+import { ImprintComponent } from './imprint/imprint.component';
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {ContactComponent} from "./contact/contact.component";
@@ -13,6 +14,7 @@ const routes: Routes = [
   {path: 'product/:id', component: ProductDetailComponent},
   {path: 'category/:name', component: ProductCategoryComponent},
   {path: 'contact', component: ContactComponent},
+  { path: 'imprint', component: ImprintComponent }
 ];
 
 @NgModule({
