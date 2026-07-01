@@ -1,7 +1,7 @@
 // Copyright (c) 2024-2026 Testsmith. All rights reserved.
 // See LICENSE for details.
 
-import {ChangeDetectorRef, Component, inject, OnDestroy, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, inject, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {CartService} from "../_services/cart.service";
 import {CustomerAccountService} from "../shared/customer-account.service";
 import {Subscription} from "rxjs";
@@ -26,6 +26,7 @@ export class HeaderComponent implements OnDestroy, OnInit {
   private cartService = inject(CartService);
   private changeDetectorRef = inject(ChangeDetectorRef);
   private translocoService = inject(TranslocoService);
+  private zone = inject(NgZone);
 
   activeLanguage: string;
   items: any;
@@ -34,7 +35,7 @@ export class HeaderComponent implements OnDestroy, OnInit {
   isLoggedIn: boolean;
   subscription: Subscription;
   showBugHuntingButton: boolean = false;
-  logoPath = 'assets/logo.png';
+  logoPath = 'assets/img/testsmith-logo-demo.png';
 
   constructor() {
     this.cartService.storageSub.subscribe(() => {
@@ -156,17 +157,15 @@ export class HeaderComponent implements OnDestroy, OnInit {
 
   navigator.geolocation.getCurrentPosition(
     (position) => {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-
-      console.log('Latitude:', latitude);
-      console.log('Longitude:', longitude);
-
-      this.setLogoByCoordinates(latitude, longitude);
+      this.zone.run(() => {
+        this.setLogoByCoordinates(position.coords.latitude, position.coords.longitude);
+      });
     },
     (error) => {
       console.error('Geolocation error:', error);
-      this.logoPath = 'assets/logo.png';
+      this.zone.run(() => {
+        this.logoPath = 'assets/logo.png';
+      });
     }
   );
 }
