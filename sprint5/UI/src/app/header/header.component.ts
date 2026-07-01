@@ -88,6 +88,7 @@ export class HeaderComponent implements OnDestroy, OnInit {
   changeSiteLanguage(language: string): void {
     this.translocoService.setActiveLang(language);
     localStorage.setItem('language', language);
+    console.log(`Language changed to: ${language}`);
     this.activeLanguage = language;
     // Update <html lang> so screen readers announce content in the right language.
     document.documentElement.setAttribute('lang', language);
