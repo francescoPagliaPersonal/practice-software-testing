@@ -8,3 +8,6 @@ node_modules/
 mutation.html
 stryker.log
 settings.local.json
+
+# Playwright
+/playwright/.auth/
